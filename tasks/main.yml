@@ -5,7 +5,7 @@
   become: yes
   apt:
     state: absent
-    name: "{{item}}"
+    name: "{{ item }}"
   loop:
     - docker
     - docker-engine
@@ -21,6 +21,11 @@
     - apt-transport-https=1.4.8
     - ca-certificates=20161130+nmu1+deb9u1
     - curl=7.52.1-5+deb9u8
+  register: apt_result
+  retries: 3
+  delay: 1
+  until: apt_result.rc == 0
+  ignore_errors: yes
 
 - name: Add docker gpg key
   become: yes
@@ -35,7 +40,7 @@
     path: /etc/apt/sources.list.d/docker.list
     create: yes
     regexp: "^deb.*?download.docker.com.*?raspbian.*$"
-    line: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ansible_distribution_release}} edge"
+    line: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} edge"
     owner: root
     group: root
     mode: 0644
@@ -44,8 +49,13 @@
   become: yes
   apt:
     update_cache: yes
-    name: "docker-ce={{docker_version}}"
+    name: "docker-ce={{ docker_version }}"
     state: present
+  register: apt_result
+  retries: 3
+  delay: 1
+  until: apt_result.rc == 0
+  ignore_errors: yes
   when: docker_version is defined
 
 # When no version is provided, install latest
@@ -55,12 +65,17 @@
     update_cache: yes
     name: "docker-ce"
     state: present
+  register: apt_result
+  retries: 3
+  delay: 1
+  until: apt_result.rc == 0
+  ignore_errors: yes
   when: docker_version is not defined
 
 - name: Add users to docker group for running docker without sudo
   become: yes
   user:
-    name: "{{item}}"
+    name: "{{ item }}"
     groups: docker
     append: yes
-  loop: "{{docker_users}}"
+  loop: "{{ docker_users }}"
