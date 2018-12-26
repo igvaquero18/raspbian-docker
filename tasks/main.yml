@@ -1,0 +1,66 @@
+---
+# tasks file for swarm
+
+- name: Uninstall older versions
+  become: yes
+  apt:
+    state: absent
+    name: "{{item}}"
+  loop:
+    - docker
+    - docker-engine
+    - docker.io
+
+- name: Install pre-requisites
+  become: yes
+  apt:
+    update_cache: yes
+    name: "{{ item }}"
+    state: present
+  loop:
+    - apt-transport-https=1.4.8
+    - ca-certificates=20161130+nmu1+deb9u1
+    - curl=7.52.1-5+deb9u8
+
+- name: Add docker gpg key
+  become: yes
+  apt_key:
+    id: F273FCD8
+    state: present
+    url: https://download.docker.com/linux/raspbian/gpg
+
+- name: Create download url in packages list
+  become: yes
+  lineinfile:
+    path: /etc/apt/sources.list.d/docker.list
+    create: yes
+    regexp: "^deb.*?download.docker.com.*?raspbian.*$"
+    line: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ansible_distribution_release}} edge"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Docker CE
+  become: yes
+  apt:
+    update_cache: yes
+    name: "docker-ce={{docker_version}}"
+    state: present
+  when: docker_version is defined
+
+# When no version is provided, install latest
+- name: Install Docker CE
+  become: yes
+  apt:
+    update_cache: yes
+    name: "docker-ce"
+    state: present
+  when: docker_version is not defined
+
+- name: Add users to docker group for running docker without sudo
+  become: yes
+  user:
+    name: "{{item}}"
+    groups: docker
+    append: yes
+  loop: "{{docker_users}}"
