@@ -1,7 +1,6 @@
 galaxy_info:
   author: Ignacio Vaquero
   description: This role installs Docker on Raspbian operating systems following the official procedure
-  company: ING
   license: BSD
   min_ansible_version: 2.7
   platforms:

@@ -35,6 +35,6 @@ BSD
 Author Information
 ------------------
 
-Ignacio Vaquero Guisasola.
-DevOps Engineer at ING Spain.
+Ignacio Vaquero Guisasola.<br/>
+DevOps Engineer at ING Spain.<br/>
 [ivaqueroguisasola@gmail.com](mailto:ivaqueroguisasola@gmail.com).

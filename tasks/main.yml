@@ -24,8 +24,7 @@
   register: apt_result
   retries: 3
   delay: 1
-  until: apt_result.rc == 0
-  ignore_errors: yes
+  until: apt_result.failed is not defined or not apt_result.failed
 
 - name: Add docker gpg key
   become: yes
@@ -54,8 +53,7 @@
   register: apt_result
   retries: 3
   delay: 1
-  until: apt_result.rc == 0
-  ignore_errors: yes
+  until: apt_result.failed is not defined or not apt_result.failed
   when: docker_version is defined
 
 # When no version is provided, install latest
@@ -68,8 +66,7 @@
   register: apt_result
   retries: 3
   delay: 1
-  until: apt_result.rc == 0
-  ignore_errors: yes
+  until: apt_result.failed is not defined or not apt_result.failed
   when: docker_version is not defined
 
 - name: Add users to docker group for running docker without sudo
